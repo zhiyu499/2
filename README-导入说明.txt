@@ -1,7 +1,7 @@
 嬉皮漫畫（m.hipmh.com）Venera Next 源
 
 文件：hipmh.js
-版本：1.6.0
+版本：1.7.0
 在线更新地址：https://raw.githubusercontent.com/zhiyu499/2/main/hipmh.js
 
 导入方式：在 Venera Next 打开「漫画源」管理，选择「添加来源」并导入 hipmh.js。也可以导入 hipmh-source.json 作为本地源列表，再从列表安装源。

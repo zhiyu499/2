@@ -1,7 +1,7 @@
 class HipmhSource extends ComicSource {
     name = "嬉皮漫畫";
     key = "hipmh";
-    version = "1.6.0";
+    version = "1.7.0";
     minAppVersion = "1.16.0";
     url = "https://raw.githubusercontent.com/zhiyu499/2/main/hipmh.js";
 
@@ -99,7 +99,10 @@ class HipmhSource extends ComicSource {
             const doc = new HtmlDocument(html);
             try {
                 const title = this.firstText(doc, ["h1", ".work-title", ".comic-title", "title"]);
-                const cover = this.firstAttr(doc, ["meta[property='og:image']", ".cover img", ".work-cover img", "img"], ["content", "data-src", "src"]);
+                const cover = this.extractMetaContent(html, "og:image") ||
+                    this.extractMetaContent(html, "twitter:image") ||
+                    this.extractMetaContent(html, "msapplication-TileImage") ||
+                    this.firstAttr(doc, [".cover img", ".work-cover img", "img"], ["content", "data-src", "data-original", "src"]);
                 const description = this.firstText(doc, ["meta[name='description']", ".description", ".work-description", ".intro"]);
                 const tags = {};
                 const genre = this.texts(doc, [".genres a", ".tags a", ".tag a"]);
@@ -320,6 +323,18 @@ class HipmhSource extends ComicSource {
             const el = doc.querySelector(selector);
             if (!el) continue;
             for (const attr of attrs) if (el.attributes[attr]) return el.attributes[attr];
+        }
+        return "";
+    };
+
+    extractMetaContent = (html, key) => {
+        const tags = String(html || "").match(/<meta\b[^>]*>/gi) || [];
+        const wanted = String(key || "").toLowerCase();
+        for (const tag of tags) {
+            const name = tag.match(/\b(?:property|name)\s*=\s*["']([^"']+)["']/i);
+            if (!name || name[1].toLowerCase() !== wanted) continue;
+            const content = tag.match(/\bcontent\s*=\s*["']([^"']*)["']/i);
+            if (content) return content[1].replace(/&amp;/gi, "&");
         }
         return "";
     };
