@@ -1,7 +1,7 @@
 class HipmhSource extends ComicSource {
     name = "嬉皮漫畫";
     key = "hipmh";
-    version = "1.7.0";
+    version = "1.8.0";
     minAppVersion = "1.16.0";
     url = "https://raw.githubusercontent.com/zhiyu499/2/main/hipmh.js";
 
@@ -112,9 +112,11 @@ class HipmhSource extends ComicSource {
 
                 const mid = this.numericMangaId(id);
                 const chapters = await this.loadChapterDirectory(mid);
+                const coverUrl = cover ? this.coverUrl(cover) : "";
+                log("info", "嬉皮漫画封面地址", JSON.stringify({ source: cover, resolved: coverUrl }));
                 return {
                     title: title || id,
-                    cover: cover ? this.coverUrl(cover) : "",
+                    cover: coverUrl,
                     description: description || "",
                     tags,
                     chapters: Object.keys(chapters).length ? chapters : null
@@ -143,7 +145,7 @@ class HipmhSource extends ComicSource {
             return { images };
         },
         onImageLoad: imageKey => ({ url: imageKey, headers: Object.assign({}, this.headers, { "Referer": "https://reader.hipmh.top/" }) }),
-        onThumbnailLoad: imageKey => ({ url: imageKey, headers: Object.assign({}, this.headers, { "Referer": "https://m.hipmh.com/" }) })
+        onThumbnailLoad: imageKey => ({ url: this.coverUrl(imageKey), headers: Object.assign({}, this.headers, { "Referer": "https://m.hipmh.com/" }) })
     };
 
     getText = async (url, extraHeaders) => {
@@ -358,7 +360,7 @@ class HipmhSource extends ComicSource {
     coverUrl = value => {
         const path = String(value || "").trim();
         if (!path) return "";
-        const imageHost = /^\/(?:kk|asa)\//i.test(path) ? "https://cover.s3imgs.top" : "https://m.hipmh.com";
+        const imageHost = /^\/(?:kk|asa|webtoon|dongman|picy)\//i.test(path) ? "https://cover.s3imgs.top" : "https://m.hipmh.com";
         return this.absoluteUrl(path, imageHost);
     };
 
