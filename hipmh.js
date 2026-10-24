@@ -1,7 +1,7 @@
 class HipmhSource extends ComicSource {
     name = "嬉皮漫畫";
     key = "hipmh";
-    version = "1.8.0";
+    version = "1.8.1";
     minAppVersion = "1.16.0";
     url = "https://raw.githubusercontent.com/zhiyu499/2/main/hipmh.js";
 
@@ -145,7 +145,11 @@ class HipmhSource extends ComicSource {
             return { images };
         },
         onImageLoad: imageKey => ({ url: imageKey, headers: Object.assign({}, this.headers, { "Referer": "https://reader.hipmh.top/" }) }),
-        onThumbnailLoad: imageKey => ({ url: this.coverUrl(imageKey), headers: Object.assign({}, this.headers, { "Referer": "https://m.hipmh.com/" }) })
+        onThumbnailLoad: imageKey => {
+            const url = this.coverUrl(imageKey);
+            log("info", "嬉皮漫画缩略图请求", JSON.stringify({ source: imageKey, resolved: url }));
+            return { url, headers: Object.assign({}, this.headers, { "Referer": "https://m.hipmh.com/" }) };
+        }
     };
 
     getText = async (url, extraHeaders) => {
